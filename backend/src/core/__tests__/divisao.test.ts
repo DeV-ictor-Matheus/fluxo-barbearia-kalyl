@@ -65,4 +65,28 @@ describe("calcularDivisao", () => {
       resultado.valorBarbeariaCentavos + resultado.valorAtendenteCentavos,
     ).toBe(7001);
   });
+
+  it("parceiro2 com walk-in: divisão 50/50 como o parceiro1", () => {
+    const resultado = calcularDivisao({
+      papel: "parceiro2",
+      clienteProprio: false,
+      valorServicoCentavos: 7000,
+      descontoCentavos: 0,
+      gorjetaCentavos: 0,
+    });
+    expect(resultado.valorBarbeariaCentavos).toBe(3500);
+    expect(resultado.valorAtendenteCentavos).toBe(3500);
+  });
+
+  it("parceiro1: divisão 50/50 - com desconto", () => {
+    const resultado = calcularDivisao({
+      papel: "parceiro1",
+      clienteProprio: false,
+      valorServicoCentavos: 7000,
+      descontoCentavos: 1000,
+      gorjetaCentavos: 0,
+    });
+    expect(resultado.valorBarbeariaCentavos).toBe(3000);
+    expect(resultado.valorAtendenteCentavos).toBe(3000);
+  });
 });
