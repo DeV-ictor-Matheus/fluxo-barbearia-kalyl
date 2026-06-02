@@ -1,0 +1,44 @@
+# Regras do projeto — Fluxo de Caixa Barbearia
+
+## Contexto
+
+Sistema de fluxo de caixa para barbearia real (modelo aluguel de cadeira, 3 usuários).
+Monorepo: `backend/` (Node + Express + Prisma + PostgreSQL) e `frontend/` (React + Vite + Tailwind, PWA).
+Objetivo duplo: resolver a dor do cliente + servir de projeto-portfólio para vaga júnior.
+
+## Linguagem e rigor
+
+- TypeScript em todo o projeto, com `strict: true`. Nunca desligue o strict.
+- Nunca use `any` para silenciar o compilador. Se o tipo for difícil, pergunte/pare.
+
+## Dinheiro (CRÍTICO)
+
+- TODO valor monetário é inteiro em centavos (R$70,00 = 7000). Nunca use float/decimal para dinheiro.
+- Nomes de campos monetários terminam em `_centavos`.
+
+## Regra de ouro do domínio: passado imutável
+
+- Lançamentos registrados NUNCA mudam de valor retroativamente.
+- O lançamento APONTA para o serviço (FK) mas COPIA o valor cobrado no momento (valor congelado).
+- Editar o preço de um serviço afeta apenas lançamentos futuros, jamais os passados.
+- A divisão (valor da barbearia / valor do atendente) também é congelada no lançamento, não recalculada.
+
+## Arquitetura
+
+- Regras de negócio ficam em `src/core/` como funções PURAS: recebem dados, devolvem dados.
+- O core NÃO acessa banco, rede, nem nada externo. Isso o mantém testável.
+- Banco, API e tela são camadas separadas do core.
+
+## Identificadores
+
+- IDs são UUID, não inteiros sequenciais.
+
+## Testes
+
+- Toda função de cálculo financeiro em `src/core/` tem teste antes de ser considerada pronta.
+
+## Escopo (não invente features)
+
+- MVP cobre: entradas (serviços), saídas (despesas), saldo.
+- FORA do MVP (não implemente sem pedido): venda de produtos, cadastro de clientes fixos,
+  separação PF/PJ, histórico de preços, autenticação robusta, recorrência automática de despesas.
