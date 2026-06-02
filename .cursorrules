@@ -42,3 +42,9 @@ Objetivo duplo: resolver a dor do cliente + servir de projeto-portfólio para va
 - MVP cobre: entradas (serviços), saídas (despesas), saldo.
 - FORA do MVP (não implemente sem pedido): venda de produtos, cadastro de clientes fixos,
   separação PF/PJ, histórico de preços, autenticação robusta, recorrência automática de despesas.
+
+## Organização de arquivos
+
+- Cada arquivo tem UMA responsabilidade. Se descrever o arquivo exige a palavra "e", divida.
+- Funções e arquivos pequenos e focados. Evite arquivos gigantes; prefira vários arquivos pequenos e bem nomeados.
+- Regra prática: arquivo passando de ~150 linhas é gatilho pra revisar se há responsabilidades demais juntas.
