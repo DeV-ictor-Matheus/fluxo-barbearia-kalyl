@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Atendente {
+  id    String  @id @default(uuid())
+  nome  String
+  papel String // "dono" | "parceiro1" | "parceiro2"
+  ativo Boolean @default(true)
+
+  entradas Entrada[]
+}
+
+model Servico {
+  id                     String @id @default(uuid())
+  nome                   String
+  precoCasaCentavos      Int
+  precoParceiro2Centavos Int
+
+  entradas Entrada[]
+}
+
+model Entrada {
+  id                     String   @id @default(uuid())
+  atendenteId            String
+  servicoId              String
+  tabelaAplicada         String // "casa" | "parceiro2"
+  clienteProprio         Boolean  @default(false)
+  valorServicoCentavos   Int
+  descontoCentavos       Int      @default(0)
+  gorjetaCentavos        Int      @default(0)
+  valorBarbeariaCentavos Int
+  valorAtendenteCentavos Int
+  metodoPagamento        String // "pix" | "cartao" | "dinheiro"
+  criadoEm               DateTime @default(now())
+
+  atendente Atendente @relation(fields: [atendenteId], references: [id])
+  servico   Servico   @relation(fields: [servicoId], references: [id])
+}
+
+model Saida {
+  id            String   @id @default(uuid())
+  categoria     String
+  recorrente    Boolean  @default(false)
+  valorCentavos Int
+  criadoEm      DateTime @default(now())
+}
