@@ -1,6 +1,8 @@
 import express from "express";
 import { registrarEntrada } from "./services/registrarEntrada.js";
 import { prisma } from "./db.js";
+import { criarSaidaSchema } from "./schemas/saidaSchema.js";
+import { registrarSaida } from "./services/registrarSaida.js";
 
 const app = express();
 
@@ -20,6 +22,28 @@ app.post("/entradas", async (req, res) => {
   } catch (erro) {
     const mensagem = erro instanceof Error ? erro.message : "Erro desconhecido";
     res.status(400).json({ erro: mensagem });
+  }
+});
+
+app.post("/saidas", async (req, res) => {
+  // 1. O PORTEIRO: valida o corpo da requisição antes de tudo.
+  const resultado = criarSaidaSchema.safeParse(req.body);
+
+  // 2. Se a validação falhou, retorna erro 400 com a resposta e PARA aqui.
+  if (!resultado.success) {
+    return res.status(400).json({
+      erro: "Dados inválidos",
+      detalhes: resultado.error.issues,
+    });
+  }
+
+  // 3. Daqui pra baixo, resultado.data é 100% confiável e tipado.
+  try {
+    const saida = await registrarSaida(resultado.data);
+    return res.status(201).json(saida);
+  } catch (erro) {
+    console.error("Erro ao registrar saída:", erro);
+    return res.status(500).json({ erro: "Erro interno ao registrar saída" });
   }
 });
 
