@@ -1,0 +1,42 @@
+# Nome do workflow — aparece na aba "Actions" do GitHub.
+name: CI
+
+# QUANDO rodar: a cada push na branch main.
+# (Quando você adotar PRs, dá pra incluir "pull_request" aqui também.)
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # Um job chamado "test". Roda numa máquina virtual Ubuntu limpa.
+  test:
+    runs-on: ubuntu-latest
+
+    # Como o código vive em backend/, todos os comandos "run"
+    # deste job executam DENTRO dessa pasta.
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      # 1. Baixa seu código do repositório pra dentro da máquina virtual.
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      # 2. Instala o Node na máquina limpa. A versão deve bater com a sua.
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # 3. Instala as dependências de forma limpa e reproduzível.
+      - name: Instalar dependências
+        run: npm ci
+
+      # 4. Gera o Prisma Client (precisa existir pra o código compilar).
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      # 5. Roda os testes. Se algum falhar, o workflow falha (fica vermelho).
+      - name: Rodar os testes
+        run: npm test
