@@ -3,6 +3,8 @@ import { registrarEntrada } from "./services/registrarEntrada.js";
 import { prisma } from "./db.js";
 import { criarSaidaSchema } from "./schemas/saidaSchema.js";
 import { registrarSaida } from "./services/registrarSaida.js";
+import { editarSaida } from "./services/editarSaida.js";
+import { editarSaidaSchema } from "./schemas/saidaSchema.js";
 
 const app = express();
 
@@ -12,6 +14,39 @@ app.use(express.json());
 // rota de saúde: serve só pra checar se o servidor está de pé
 app.get("/", (req, res) => {
   res.json({ status: "ok", mensagem: "API da Barbearia rodando" });
+});
+
+app.patch("/saidas/:id", async (req, res) => {
+  const { id } = req.params;
+
+  // 1. Rejeita corpo vazio ANTES de validar — nada pra atualizar não faz sentido.
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({
+      erro: "Nenhum campo para atualizar foi enviado",
+    });
+  }
+
+  // 2. Valida o corpo: campos opcionais, mas nenhum extra permitido.
+  const resultado = editarSaidaSchema.safeParse(req.body);
+
+  if (!resultado.success) {
+    return res.status(400).json({
+      erro: "Dados inválidos",
+      detalhes: resultado.error.issues,
+    });
+  }
+
+  // 3. Atualiza.
+  try {
+    const saida = await editarSaida(id, resultado.data);
+    return res.status(200).json(saida);
+  } catch (erro: any) {
+    if (erro?.code === "P2025") {
+      return res.status(404).json({ erro: "Saída não encontrada" });
+    }
+    console.error("Erro ao editar saída:", erro);
+    return res.status(500).json({ erro: "Erro interno ao editar saída" });
+  }
 });
 
 // endpoint que registra uma entrada
