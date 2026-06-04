@@ -36,6 +36,8 @@ jobs:
       # 4. Gera o Prisma Client (precisa existir pra o código compilar).
       - name: Gerar Prisma Client
         run: npx prisma generate
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
 
       # 5. Roda os testes. Se algum falhar, o workflow falha (fica vermelho).
       - name: Rodar os testes
