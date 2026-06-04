@@ -5,11 +5,22 @@ import { criarSaidaSchema } from "./schemas/saidaSchema.js";
 import { registrarSaida } from "./services/registrarSaida.js";
 import { editarSaida } from "./services/editarSaida.js";
 import { editarSaidaSchema } from "./schemas/saidaSchema.js";
+import { listarSaidas } from "./services/listarSaidas.js";
 
 const app = express();
 
 // permite que o servidor entenda JSON no corpo das requisições
 app.use(express.json());
+
+app.get("/saidas", async (req, res) => {
+  try {
+    const saidas = await listarSaidas();
+    return res.status(200).json(saidas);
+  } catch (erro) {
+    console.error("Erro ao listar saídas:", erro);
+    return res.status(500).json({ erro: "Erro interno ao listar saídas" });
+  }
+});
 
 // rota de saúde: serve só pra checar se o servidor está de pé
 app.get("/", (req, res) => {
