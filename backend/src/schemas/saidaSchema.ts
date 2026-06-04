@@ -28,5 +28,11 @@ export const criarSaidaSchema = z.object({
   data: z.coerce.date({ message: "data inválida" }),
 });
 
-// O tipo TypeScript nasce do schema — fonte única, sem repetição.
 export type CriarSaidaInput = z.infer<typeof criarSaidaSchema>;
+
+// Edição (PATCH): todos os campos opcionais (.partial), pois o dono
+// pode corrigir só um campo. .strict() rejeita campos não permitidos
+// (id, criadoEm, ou qualquer desconhecido) — falha alto em vez de ignorar.
+export const editarSaidaSchema = criarSaidaSchema.partial().strict();
+
+export type EditarSaidaInput = z.infer<typeof editarSaidaSchema>;
