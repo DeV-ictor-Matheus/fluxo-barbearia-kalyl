@@ -50,7 +50,7 @@ model Entrada {
 
 model Saida {
   id            String          @id @default(uuid())
-  descricao     String
+  descricao     String?
   categoria     CategoriaSaida
   recorrente    Boolean         @default(false)
   valorCentavos Int
