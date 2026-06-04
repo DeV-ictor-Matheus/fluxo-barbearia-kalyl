@@ -49,9 +49,22 @@ model Entrada {
 }
 
 model Saida {
-  id            String   @id @default(uuid())
-  categoria     String
-  recorrente    Boolean  @default(false)
+  id            String          @id @default(uuid())
+  descricao     String
+  categoria     CategoriaSaida
+  recorrente    Boolean         @default(false)
   valorCentavos Int
-  criadoEm      DateTime @default(now())
+  data          DateTime        // competência do gasto (pode ser retroativa)
+  criadoEm      DateTime        @default(now()) // auditoria, imutável
+}
+
+enum CategoriaSaida {
+  ALUGUEL
+  TAXA_CARTAO
+  PRODUTOS
+  ALUGUEL_POS
+  SALARIO
+  CONTAS
+  MARKETING
+  OUTROS
 }
