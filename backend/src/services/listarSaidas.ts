@@ -1,4 +1,4 @@
-import { prisma } from "../db";
+import { prisma } from "../db.js";
 
 /**
  * Lista todas as Saídas, da mais recente para a mais antiga

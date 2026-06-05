@@ -1,5 +1,5 @@
-import { prisma } from "../db";
-import { EditarSaidaInput } from "../schemas/saidaSchema";
+import { prisma } from "../db.js";
+import { EditarSaidaInput } from "../schemas/saidaSchema.js";
 
 /**
  * Edita uma Saída existente (correção de lançamento manual).

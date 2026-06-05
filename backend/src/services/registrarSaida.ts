@@ -1,5 +1,5 @@
-import { prisma } from "../db";
-import { CriarSaidaInput } from "../schemas/saidaSchema";
+import { prisma } from "../db.js";
+import { CriarSaidaInput } from "../schemas/saidaSchema.js";
 
 /**
  * Registra uma Saída (despesa da barbearia).
