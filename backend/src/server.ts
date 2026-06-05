@@ -51,8 +51,13 @@ app.patch("/saidas/:id", async (req, res) => {
   try {
     const saida = await editarSaida(id, resultado.data);
     return res.status(200).json(saida);
-  } catch (erro: any) {
-    if (erro?.code === "P2025") {
+  } catch (erro: unknown) {
+    if (
+      typeof erro === "object" &&
+      erro !== null &&
+      "code" in erro &&
+      erro.code === "P2025"
+    ) {
       return res.status(404).json({ erro: "Saída não encontrada" });
     }
     console.error("Erro ao editar saída:", erro);
