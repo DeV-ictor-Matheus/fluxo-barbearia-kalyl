@@ -6,7 +6,7 @@ import { registrarSaida } from "./services/registrarSaida.js";
 import { editarSaida } from "./services/editarSaida.js";
 import { editarSaidaSchema } from "./schemas/saidaSchema.js";
 import { listarSaidas } from "./services/listarSaidas.js";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "./generated/prisma/client.js";
 
 const app = express();
 
