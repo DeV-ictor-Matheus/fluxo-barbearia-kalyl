@@ -6,6 +6,7 @@ import { registrarSaida } from "./services/registrarSaida.js";
 import { editarSaida } from "./services/editarSaida.js";
 import { editarSaidaSchema } from "./schemas/saidaSchema.js";
 import { listarSaidas } from "./services/listarSaidas.js";
+import { Prisma } from "@prisma/client";
 
 const app = express();
 
@@ -53,9 +54,7 @@ app.patch("/saidas/:id", async (req, res) => {
     return res.status(200).json(saida);
   } catch (erro: unknown) {
     if (
-      typeof erro === "object" &&
-      erro !== null &&
-      "code" in erro &&
+      erro instanceof Prisma.PrismaClientKnownRequestError &&
       erro.code === "P2025"
     ) {
       return res.status(404).json({ erro: "Saída não encontrada" });
