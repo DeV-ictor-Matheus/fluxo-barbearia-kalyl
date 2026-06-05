@@ -6,6 +6,8 @@ name: CI
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   # Um job chamado "test". Roda numa máquina virtual Ubuntu limpa.
@@ -39,6 +41,14 @@ jobs:
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
 
-      # 5. Roda os testes. Se algum falhar, o workflow falha (fica vermelho).
+      # 5. Verifica o estilo e as boas práticas do código.
+      - name: Rodar o lint
+        run: npm run lint
+
+      # 6. Verifica a correção de tipos (sem gerar arquivos).
+      - name: Verificar tipos
+        run: npm run type-check
+
+      # 7. Roda os testes. Se algum falhar, o workflow falha (fica vermelho).
       - name: Rodar os testes
         run: npm test
