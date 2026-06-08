@@ -7,6 +7,7 @@ import { editarSaida } from "./services/editarSaida.js";
 import { editarSaidaSchema } from "./schemas/saidaSchema.js";
 import { listarSaidas } from "./services/listarSaidas.js";
 import { Prisma } from "./generated/prisma/client.js";
+import { criarEntradaSchema } from "./schemas/entradaSchema.js";
 
 const app = express();
 
@@ -65,13 +66,27 @@ app.patch("/saidas/:id", async (req, res) => {
 });
 
 // endpoint que registra uma entrada
+// endpoint que registra uma entrada
 app.post("/entradas", async (req, res) => {
+  // 1. O PORTEIRO: valida o formato do corpo antes de tudo.
+  const resultado = criarEntradaSchema.safeParse(req.body);
+
+  // 2. Se a validação de formato falhou, retorna 400 com os detalhes e PARA aqui.
+  if (!resultado.success) {
+    return res.status(400).json({
+      erro: "Dados inválidos",
+      detalhes: resultado.error.issues,
+    });
+  }
+
+  // 3. resultado.data é confiável e tipado. Erros de regra de negócio
+  //    (atendente/serviço inexistente, desconto acima do teto) vêm como Error -> 400.
   try {
-    const entrada = await registrarEntrada(req.body);
-    res.status(201).json(entrada);
+    const entrada = await registrarEntrada(resultado.data);
+    return res.status(201).json(entrada);
   } catch (erro) {
     const mensagem = erro instanceof Error ? erro.message : "Erro desconhecido";
-    res.status(400).json({ erro: mensagem });
+    return res.status(400).json({ erro: mensagem });
   }
 });
 
