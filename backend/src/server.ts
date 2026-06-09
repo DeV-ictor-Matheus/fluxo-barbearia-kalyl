@@ -8,6 +8,8 @@ import { editarSaidaSchema } from "./schemas/saidaSchema.js";
 import { listarSaidas } from "./services/listarSaidas.js";
 import { Prisma } from "./generated/prisma/client.js";
 import { criarEntradaSchema } from "./schemas/entradaSchema.js";
+import { listarEntradas } from "./services/listarEntradas.js";
+import { resumoEntradas } from "./services/resumoEntradas.js";
 
 const app = express();
 
@@ -62,6 +64,54 @@ app.patch("/saidas/:id", async (req, res) => {
     }
     console.error("Erro ao editar saída:", erro);
     return res.status(500).json({ erro: "Erro interno ao editar saída" });
+  }
+});
+
+// valida o formato YYYY-MM-DD do query param ?data (opcional)
+const FORMATO_DATA = /^\d{4}-\d{2}-\d{2}$/;
+
+// resumo do dia para o Dashboard balcão (total + por barbeiro, SEM R$)
+app.get("/entradas/resumo", async (req, res) => {
+  const { data } = req.query;
+
+  // se veio ?data, tem que estar no formato certo
+  if (
+    data !== undefined &&
+    (typeof data !== "string" || !FORMATO_DATA.test(data))
+  ) {
+    return res
+      .status(400)
+      .json({ erro: "Parâmetro data inválido — use YYYY-MM-DD" });
+  }
+
+  try {
+    const resumo = await resumoEntradas(data);
+    return res.status(200).json(resumo);
+  } catch (erro) {
+    const mensagem = erro instanceof Error ? erro.message : "Erro desconhecido";
+    return res.status(500).json({ erro: mensagem });
+  }
+});
+
+// lista as entradas de um dia (default: hoje) para a tela "Entradas de hoje"
+app.get("/entradas", async (req, res) => {
+  const { data } = req.query;
+
+  if (
+    data !== undefined &&
+    (typeof data !== "string" || !FORMATO_DATA.test(data))
+  ) {
+    return res
+      .status(400)
+      .json({ erro: "Parâmetro data inválido — use YYYY-MM-DD" });
+  }
+
+  try {
+    const entradas = await listarEntradas(data);
+    return res.status(200).json(entradas);
+  } catch (erro) {
+    const mensagem = erro instanceof Error ? erro.message : "Erro desconhecido";
+    return res.status(500).json({ erro: mensagem });
   }
 });
 
