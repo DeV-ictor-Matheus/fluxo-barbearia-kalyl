@@ -1,3 +1,4 @@
+import { AppError } from "../errors/app-errors.js";
 import { prisma } from "../db.js";
 import { calcularDivisao, type Papel } from "../core/divisao.js";
 import { CriarEntradaInput } from "../schemas/entradaSchema.js";
@@ -48,7 +49,7 @@ export async function registrarEntrada(dados: CriarEntradaInput) {
   // por isso não cabe no Zod. Math.floor mantém o teto em centavos inteiros.
   const tetoDesconto = Math.floor(valorServicoCentavos / 2);
   if (dados.descontoCentavos > tetoDesconto) {
-    throw new Error(
+    throw new AppError(
       `Desconto acima do permitido: máximo ${tetoDesconto} centavos (50% do serviço).`,
     );
   }
