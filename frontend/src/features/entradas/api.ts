@@ -2,8 +2,8 @@
 // Responsabilidade única: o QUE mandar ao servidor e COMO. Não conhece React.
 // Espelha o papel de features/atendentes/api.ts.
 
-import { api } from "../../lib/api-client";
-import type { Entrada, MetodoPagamento } from "../../types/entrada.ts";
+import { api } from "@/lib/api-client";
+import type { Entrada, MetodoPagamento } from "@/types/entrada";
 
 // CriarEntradaInput — espelhado manualmente do backend.
 // Fonte de verdade: backend/src/schemas/entradaSchema.ts (criarEntradaSchema).
