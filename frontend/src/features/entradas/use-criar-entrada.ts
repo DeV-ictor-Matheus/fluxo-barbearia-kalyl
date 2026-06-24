@@ -1,5 +1,3 @@
-// frontend/src/features/entradas/use-criar-entrada.ts
-//
 // Hook do write financeiro da Tela E (Nova Entrada).
 // Cria uma Entrada imutável e revalida as telas que dependem dela.
 //
@@ -10,8 +8,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { criarEntrada, type CriarEntradaInput } from "./api";
 import { entradasKeys } from "./entradas-keys";
-import type { Entrada } from "../../types/entrada.ts";
-import type { ApiError } from "../../lib/api-error";
+import type { Entrada } from "@/types/entrada";
+import type { ApiError } from "@/lib/api-error";
 
 export function useCriarEntrada() {
   const queryClient = useQueryClient();
