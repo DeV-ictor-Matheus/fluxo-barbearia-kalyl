@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
@@ -21,5 +21,13 @@ export default defineConfig({
         rewrite: (caminho) => caminho.replace(/^\/api/, ""),
       },
     },
+  },
+  test: {
+    // Ambiente mínimo: funções puras (ex.: formatação monetária) não tocam o DOM.
+    // Testes que precisarem de DOM declaram `// @vitest-environment jsdom` no topo do arquivo.
+    environment: "node",
+    // Sem globais: describe/it/expect são importados de "vitest" em cada teste,
+    // mantendo coerência com o resto do projeto (imports explícitos, sem barrel).
+    globals: false,
   },
 });
