@@ -5,18 +5,19 @@
 // de verão atualmente. Se o DST voltar, trocar por date-fns-tz / Luxon.
 const OFFSET_BRASILIA_MS = 3 * 60 * 60 * 1000;
 
-// Recebe "YYYY-MM-DD" e devolve o início e o fim daquele dia em Brasília,
-// expressos em instantes UTC (que é como o Postgres compara o DateTime).
+// Recebe "YYYY-MM-DD" e devolve o início (inclusivo) e o fim (EXCLUSIVO)
+// daquele dia em Brasília, expressos em instantes UTC — o intervalo half-open
+// [inicio, fimExclusivo) que o Prisma consome com gte/lt.
 export function rangeDoDiaBrasilia(dataISO: string): {
   inicio: Date;
-  fim: Date;
+  fimExclusivo: Date;
 } {
   const inicio = new Date(`${dataISO}T00:00:00.000Z`);
   inicio.setTime(inicio.getTime() + OFFSET_BRASILIA_MS);
 
-  const fim = new Date(inicio.getTime() + 24 * 60 * 60 * 1000 - 1);
+  const fimExclusivo = new Date(inicio.getTime() + 24 * 60 * 60 * 1000);
 
-  return { inicio, fim };
+  return { inicio, fimExclusivo };
 }
 
 // Devolve a data de "hoje" em Brasília no formato YYYY-MM-DD.
