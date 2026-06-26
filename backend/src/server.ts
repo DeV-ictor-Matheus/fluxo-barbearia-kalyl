@@ -12,6 +12,7 @@ import { resumoEntradas } from "./services/resumoEntradas.js";
 import { AppError } from "./errors/app-errors.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import { criarServicoSchema } from "./schemas/servicoSchema.js";
+import { parseDataQuery } from "./lib/parseDataQuery.js";
 
 const app = express();
 
@@ -41,40 +42,23 @@ app.patch("/saidas/:id", async (req, res) => {
   res.status(200).json(saida);
 });
 
-// valida o formato YYYY-MM-DD do query param ?data (opcional)
-const FORMATO_DATA = /^\d{4}-\d{2}-\d{2}$/;
-
 // resumo do dia para o Dashboard balcão (total + por barbeiro, SEM R$)
 app.get("/entradas/resumo", async (req, res) => {
-  const { data } = req.query;
-
-  if (
-    data !== undefined &&
-    (typeof data !== "string" || !FORMATO_DATA.test(data))
-  ) {
-    throw new AppError("Parâmetro data inválido — use YYYY-MM-DD");
-  }
+  const data = parseDataQuery(req.query.data);
 
   const resumo = await resumoEntradas(data);
   res.status(200).json(resumo);
 });
 
-// lista as entradas de um dia (default: hoje) para a tela "Entradas de hoje"
+// lista as entradas de um dia (default: hoje em Brasília), da mais recente
+// para a mais antiga — base da Tela G (Entradas de hoje).
 app.get("/entradas", async (req, res) => {
-  const { data } = req.query;
-
-  if (
-    data !== undefined &&
-    (typeof data !== "string" || !FORMATO_DATA.test(data))
-  ) {
-    throw new AppError("Parâmetro data inválido — use YYYY-MM-DD");
-  }
+  const data = parseDataQuery(req.query.data);
 
   const entradas = await listarEntradas(data);
-  res.status(200).json(entradas);
+  res.status(200).json({ entradas });
 });
 
-// endpoint que registra uma entrada
 // endpoint que registra uma entrada
 app.post("/entradas", async (req, res) => {
   // Valida e extrai os dados já tipados. Se o formato falhar, lança
