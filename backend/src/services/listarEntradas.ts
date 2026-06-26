@@ -7,11 +7,11 @@ import { rangeDoDiaBrasilia, hojeBrasilia } from "../lib/datasBrasilia.js";
  */
 export async function listarEntradas(dataISO?: string) {
   const dia = dataISO ?? hojeBrasilia();
-  const { inicio, fim } = rangeDoDiaBrasilia(dia);
+  const { inicio, fimExclusivo } = rangeDoDiaBrasilia(dia);
 
   const entradas = await prisma.entrada.findMany({
     where: {
-      criadoEm: { gte: inicio, lte: fim },
+      criadoEm: { gte: inicio, lt: fimExclusivo },
     },
     orderBy: { criadoEm: "desc" },
     include: {

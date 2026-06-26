@@ -17,41 +17,40 @@ describe("rangeDoDiaBrasilia", () => {
     );
   });
 
-  it("fim do dia = último milissegundo, já no dia seguinte em UTC (02:59:59.999Z)", () => {
-    const { fim } = rangeDoDiaBrasilia("2026-06-11");
-    expect(fim.toISOString()).toBe("2026-06-12T02:59:59.999Z");
-    expect(fim.getTime()).toBe(
-      fromZonedTime("2026-06-11T23:59:59.999", TZ).getTime(),
+  it("fimExclusivo = meia-noite do dia seguinte em Brasília, em UTC (03:00Z)", () => {
+    const { fimExclusivo } = rangeDoDiaBrasilia("2026-06-11");
+    expect(fimExclusivo.toISOString()).toBe("2026-06-12T03:00:00.000Z");
+    expect(fimExclusivo.getTime()).toBe(
+      fromZonedTime("2026-06-12T00:00:00.000", TZ).getTime(),
     );
   });
 
-  it("o range cobre exatamente 24h - 1ms (sem buraco, sem sobreposição)", () => {
-    const { inicio, fim } = rangeDoDiaBrasilia("2026-06-11");
-    expect(fim.getTime() - inicio.getTime()).toBe(24 * 60 * 60 * 1000 - 1);
+  it("o range cobre exatamente 24h (half-open, sem buraco nem sobreposição)", () => {
+    const { inicio, fimExclusivo } = rangeDoDiaBrasilia("2026-06-11");
+    expect(fimExclusivo.getTime() - inicio.getTime()).toBe(24 * 60 * 60 * 1000);
   });
 
   it("uma entrada às 23:30 de Brasília pertence ao dia (não vaza pro seguinte)", () => {
-    const { inicio, fim } = rangeDoDiaBrasilia("2026-06-11");
-    // 23:30 de 11/06 em São Paulo = 02:30Z de 12/06. Tem que cair DENTRO.
+    const { inicio, fimExclusivo } = rangeDoDiaBrasilia("2026-06-11");
     const entrada = fromZonedTime("2026-06-11T23:30:00.000", TZ);
     expect(entrada.getTime()).toBeGreaterThanOrEqual(inicio.getTime());
-    expect(entrada.getTime()).toBeLessThanOrEqual(fim.getTime());
+    expect(entrada.getTime()).toBeLessThan(fimExclusivo.getTime()); // era toBeLessThanOrEqual
   });
 
-  it("uma entrada às 00:00 do dia seguinte (Brasília) fica FORA do range", () => {
-    const { fim } = rangeDoDiaBrasilia("2026-06-11");
-    // meia-noite de 12/06 em São Paulo = 03:00Z de 12/06, logo acima do fim.
+  it("00:00 do dia seguinte (Brasília) é exatamente o fimExclusivo, logo FORA do range", () => {
+    const { fimExclusivo } = rangeDoDiaBrasilia("2026-06-11");
     const proximoDia = fromZonedTime("2026-06-12T00:00:00.000", TZ);
-    expect(proximoDia.getTime()).toBeGreaterThan(fim.getTime());
+    // Half-open: a fronteira pertence ao dia seguinte, não a este.
+    expect(proximoDia.getTime()).toBe(fimExclusivo.getTime());
   });
 
   it("concorda com a IANA na virada de ano (sem off-by-one de dia)", () => {
-    const { inicio, fim } = rangeDoDiaBrasilia("2026-12-31");
+    const { inicio, fimExclusivo } = rangeDoDiaBrasilia("2026-12-31");
     expect(inicio.getTime()).toBe(
       fromZonedTime("2026-12-31T00:00:00.000", TZ).getTime(),
     );
-    expect(fim.getTime()).toBe(
-      fromZonedTime("2026-12-31T23:59:59.999", TZ).getTime(),
+    expect(fimExclusivo.getTime()).toBe(
+      fromZonedTime("2027-01-01T00:00:00.000", TZ).getTime(),
     );
   });
 });

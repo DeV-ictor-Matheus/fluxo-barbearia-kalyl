@@ -11,12 +11,13 @@ import { montarResumo, type GrupoContagem } from "../core/resumo.js";
  */
 export async function resumoEntradas(dataISO?: string) {
   const dia = dataISO ?? hojeBrasilia();
-  const { inicio, fim } = rangeDoDiaBrasilia(dia);
+  const { inicio, fimExclusivo } = rangeDoDiaBrasilia(dia);
 
-  // Conta no BANCO, agrupando por atendente (GROUP BY, não na aplicação).
+  // Entrada é imutável e nasce no instante do fato, então criadoEm É a
+  // competência — não há campo de data separado como no Saida (que é editável).
   const gruposPrisma = await prisma.entrada.groupBy({
     by: ["atendenteId"],
-    where: { criadoEm: { gte: inicio, lte: fim } },
+    where: { criadoEm: { gte: inicio, lt: fimExclusivo } },
     _count: { _all: true },
   });
 
