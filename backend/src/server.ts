@@ -47,7 +47,7 @@ app.get("/entradas/resumo", async (req, res) => {
   const data = parseDataQuery(req.query.data);
 
   const resumo = await resumoEntradas(data);
-  res.status(200).json(resumo);
+  res.status(200).json({ resumo });
 });
 
 // lista as entradas de um dia (default: hoje em Brasília), da mais recente
