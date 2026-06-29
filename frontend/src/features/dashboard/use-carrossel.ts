@@ -4,7 +4,8 @@
 // Garantias:
 //  - cleanup do timer (sem vazamento entre renders);
 //  - pausa quando a aba perde foco (document.hidden) — não gira tela invisível;
-//  - clamp do índice quando `total` muda (barbeiro ativado/desativado no refetch);
+//  - índice sempre válido por DERIVAÇÃO (indice % total), não por setState num
+//    efeito — evita renders em cascata (regra react-hooks/set-state-in-effect);
 //  - respeita prefers-reduced-motion: sem auto-rotação (acessibilidade).
 
 import { useEffect, useState } from "react";
@@ -21,14 +22,6 @@ export function useCarrossel({
   intervaloMs = 4000,
 }: UseCarrosselOptions) {
   const [indice, setIndice] = useState(0);
-
-  // Mantém o índice válido se `total` encolher (ex.: barbeiro desativado).
-  // Evita apontar para uma posição que não existe mais no array.
-  useEffect(() => {
-    if (total > 0 && indice >= total) {
-      setIndice(0);
-    }
-  }, [total, indice]);
 
   useEffect(() => {
     // Nada a rotacionar com 0 ou 1 item — um único barbeiro fica fixo.
@@ -70,5 +63,7 @@ export function useCarrossel({
     };
   }, [total, intervaloMs]);
 
-  return indice;
+  // Índice seguro derivado: se a lista encolheu (barbeiro desativado no
+  // refetch), o módulo "dá a volta" para uma posição válida — sem estado extra.
+  return total > 0 ? indice % total : 0;
 }
