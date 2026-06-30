@@ -1,15 +1,25 @@
-// Orquestrador da Tela G (Entradas de hoje). Lê a lista do dia e escolhe
-// o estado a renderizar. Família "balcão": projeção operacional, sem R$.
-// Loading e erro entram em fatia posterior (hoje: early-return mínimo).
+// Orquestrador da Entradas de hoje. Lê a lista do dia + o resumo
+// (chips de barbeiro, sempre os 3 com zero-fill) e escolhe o estado a
+// renderizar. Família "balcão": projeção operacional, sem R$. Loading e
+// erro entram em fatia posterior.
 
 import { useEntradasHoje } from "../use-entradas-hoje";
+import { useFiltroBarbeiro } from "../use-filtro-barbeiro";
+import { useResumo } from "@/features/dashboard/use-resumo";
 import { EntradaItem } from "./entrada-item";
 
 export function EntradasHoje() {
   const { data: entradas } = useEntradasHoje();
+  const { data: resumo } = useResumo();
 
-  // Early-return mínimo enquanto não há dados (loading caprichado vem depois).
-  if (!entradas) return null;
+  // Hooks SEMPRE no topo, antes de qualquer return condicional (rules-of-hooks).
+  // `?? []` evita undefined no loading; o early-return abaixo descarta o render.
+  const { selecionado, setSelecionado, entradasFiltradas } = useFiltroBarbeiro(
+    entradas ?? [],
+  );
+
+  // Espera as DUAS queries (lista + resumo). Loading caprichado vem depois.
+  if (!entradas || !resumo) return null;
 
   return (
     <div className="mx-auto flex h-dvh max-w-md flex-col bg-zinc-950 px-4 py-3 text-zinc-100">
@@ -29,17 +39,52 @@ export function EntradasHoje() {
 
         <div className="mt-3.5 flex items-baseline gap-2">
           <span className="text-[44px] font-medium leading-none text-zinc-100">
-            {entradas.length}
+            {entradasFiltradas.length}
           </span>
           <span className="text-[14px] uppercase tracking-[0.08em] text-zinc-500">
-            {entradas.length === 1 ? "atendimento" : "atendimentos"}
+            {entradasFiltradas.length === 1 ? "atendimento" : "atendimentos"}
           </span>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setSelecionado(null)}
+            className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+              selecionado === null
+                ? "bg-amber-500 text-zinc-950"
+                : "bg-zinc-900 text-zinc-400"
+            }`}
+          >
+            Todos
+          </button>
+          {resumo.porBarbeiro.map((b) => (
+            <button
+              key={b.atendenteId}
+              type="button"
+              onClick={() => setSelecionado(b.atendenteId)}
+              className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+                selecionado === b.atendenteId
+                  ? "bg-amber-500 text-zinc-950"
+                  : "bg-zinc-900 text-zinc-400"
+              }`}
+            >
+              {b.nome}{" "}
+              <span
+                className={
+                  selecionado === b.atendenteId ? "opacity-70" : "opacity-50"
+                }
+              >
+                {b.quantidade}
+              </span>
+            </button>
+          ))}
         </div>
       </header>
 
       <div className="my-4 h-px bg-zinc-900" />
 
-      {entradas.length === 0 ? (
+      {entradasFiltradas.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center pb-12 text-center">
           <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-zinc-900 text-zinc-600">
             <svg
@@ -59,12 +104,14 @@ export function EntradasHoje() {
             </svg>
           </div>
           <span className="text-[14px] text-zinc-500">
-            Dia ainda sem movimento
+            {selecionado === null
+              ? "Dia ainda sem movimento"
+              : "Nenhuma entrada deste barbeiro hoje"}
           </span>
         </div>
       ) : (
         <div className="flex flex-col gap-0.5 overflow-y-auto">
-          {entradas.map((entrada) => (
+          {entradasFiltradas.map((entrada) => (
             <EntradaItem key={entrada.id} entrada={entrada} />
           ))}
         </div>
