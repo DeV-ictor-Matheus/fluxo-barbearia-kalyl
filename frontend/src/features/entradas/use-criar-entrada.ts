@@ -8,6 +8,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { criarEntrada, type CriarEntradaInput } from "./api";
 import { entradasKeys } from "./entradas-keys";
+import { dashboardKeys } from "@/features/dashboard/dashboard-keys";
 import type { Entrada } from "@/types/entrada";
 import type { ApiError } from "@/lib/api-error";
 
@@ -27,10 +28,7 @@ export function useCriarEntrada() {
       // e o resumo do Dashboard (Tela F). Ambas refazem o fetch do servidor
       // — a fonte da verdade — em vez de adivinhar o novo estado no cliente.
       queryClient.invalidateQueries({ queryKey: entradasKeys.hoje() });
-
-      // TODO: migrar para dashboardKeys.resumo() quando a Tela F nascer.
-      // Inline por ora porque a feature `dashboard` ainda não existe.
-      queryClient.invalidateQueries({ queryKey: ["dashboard", "resumo"] });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.resumo() });
     },
 
     // retry herdado da config global (retry: 0 para mutations).
