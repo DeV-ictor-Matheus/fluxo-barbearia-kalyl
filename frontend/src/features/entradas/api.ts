@@ -3,7 +3,11 @@
 // Espelha o papel de features/atendentes/api.ts.
 
 import { api } from "@/lib/api-client";
-import type { Entrada, MetodoPagamento } from "@/types/entrada";
+import type {
+  Entrada,
+  MetodoPagamento,
+  EntradaResumida,
+} from "@/types/entrada";
 
 // CriarEntradaInput — espelhado manualmente do backend.
 // Fonte de verdade: backend/src/schemas/entradaSchema.ts (criarEntradaSchema).
@@ -28,4 +32,19 @@ export interface CriarEntradaInput {
  */
 export async function criarEntrada(input: CriarEntradaInput): Promise<Entrada> {
   return api.post<Entrada>("/entradas", input);
+}
+
+// Envelope do contrato GET /entradas. Confinado aqui — a função desembrulha
+// e devolve só o array, escondendo o envelope do resto do app.
+interface ListaEntradasResponse {
+  entradas: EntradaResumida[];
+}
+
+/**
+ * Lista as entradas de hoje (projeção operacional, sem valores).
+ * Read de balcão: o backend já omite o financeiro; o tipo reflete isso.
+ */
+export async function buscarEntradasHoje(): Promise<EntradaResumida[]> {
+  const { entradas } = await api.get<ListaEntradasResponse>("/entradas");
+  return entradas;
 }

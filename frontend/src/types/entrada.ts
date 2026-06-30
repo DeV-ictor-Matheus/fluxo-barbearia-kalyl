@@ -27,3 +27,15 @@ export interface Entrada {
   /** ISO 8601 string (DateTime no Prisma, serializado na resposta HTTP). */
   criadoEm: string;
 }
+
+/**
+ * Projeção OPERACIONAL de uma Entrada (visão de balcão / Tela G).
+ * Reflete exatamente o select de GET /entradas: SEM valores financeiros.
+ * Não confundir com `Entrada` (visão completa, com valor — uso do Relatório).
+ */
+export interface EntradaResumida {
+  id: string;
+  criadoEm: string;
+  atendente: { id: string; nome: string };
+  servico: { id: string; nome: string };
+}
