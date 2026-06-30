@@ -1,8 +1,7 @@
 # Nome do workflow — aparece na aba "Actions" do GitHub.
 name: CI
 
-# QUANDO rodar: a cada push na branch main.
-# (Quando você adotar PRs, dá pra incluir "pull_request" aqui também.)
+# QUANDO rodar: a cada push na main e em PRs que miram a main.
 on:
   push:
     branches: [main]
@@ -10,8 +9,8 @@ on:
     branches: [main]
 
 jobs:
-  # Um job chamado "test". Roda numa máquina virtual Ubuntu limpa.
-  test:
+  # Job do backend. Roda numa máquina virtual Ubuntu limpa.
+  backend:
     runs-on: ubuntu-latest
 
     # Como o código vive em backend/, todos os comandos "run"
@@ -21,7 +20,7 @@ jobs:
         working-directory: backend
 
     steps:
-      # 1. Baixa seu código do repositório pra dentro da máquina virtual.
+      # 1. Baixa o código do repositório pra dentro da máquina virtual.
       - name: Baixar o código
         uses: actions/checkout@v6
 
@@ -50,5 +49,41 @@ jobs:
         run: npm run type-check
 
       # 7. Roda os testes. Se algum falhar, o workflow falha (fica vermelho).
+      - name: Rodar os testes
+        run: npm test
+
+  # Job do frontend. Sem Prisma e sem banco — o front não tem nada disso.
+  frontend:
+    runs-on: ubuntu-latest
+
+    # Todos os "run" deste job executam DENTRO de frontend/.
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      # 1. Baixa o código do repositório pra dentro da máquina virtual.
+      - name: Baixar o código
+        uses: actions/checkout@v6
+
+      # 2. Instala o Node na máquina limpa.
+      - name: Instalar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      # 3. Instala as dependências de forma limpa e reproduzível.
+      - name: Instalar dependências
+        run: npm ci
+
+      # 4. Verifica o estilo e as boas práticas do código.
+      - name: Rodar o lint
+        run: npm run lint
+
+      # 5. Verifica a correção de tipos (sem gerar arquivos).
+      - name: Verificar tipos
+        run: npm run type-check
+
+      # 6. Roda os testes. Se algum falhar, o workflow falha (fica vermelho).
       - name: Rodar os testes
         run: npm test
