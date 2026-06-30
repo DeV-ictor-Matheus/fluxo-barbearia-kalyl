@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatarCentavos } from "@/lib/format";
+import { formatarCentavos, formatarHora } from "@/lib/format";
 
 // Normaliza qualquer espaço (incluindo o non-breaking space \u00A0 e o
 // narrow no-break \u202F que o Intl pt-BR usa) para um espaço comum,
@@ -33,5 +33,23 @@ describe("formatarCentavos", () => {
   it("preserva o último centavo sem perda (regra do domínio)", () => {
     // 1 centavo nunca pode sumir — pilar da integridade financeira.
     expect(normalizarEspacos(formatarCentavos(1))).toBe("R$ 0,01");
+  });
+});
+
+describe("formatarHora", () => {
+  it("converte UTC para o horário de Brasília (UTC-3)", () => {
+    // 17:49 UTC = 14:49 em Brasília. O teste PROVA o fuso, não só o formato.
+    expect(formatarHora("2026-06-30T17:49:29.839Z")).toBe("14:49");
+  });
+
+  it("formata com dois dígitos em horas e minutos", () => {
+    // 12:05 UTC = 09:05 BRT — confirma o zero-padding (09, não 9).
+    expect(formatarHora("2026-06-30T12:05:00.000Z")).toBe("09:05");
+  });
+
+  it("cruza a meia-noite corretamente (UTC-3 puxa para o dia anterior)", () => {
+    // 02:30 UTC do dia 30 = 23:30 BRT do dia 29. Prova que a conversão
+    // de fuso considera a virada de data, não só subtrai 3 das horas.
+    expect(formatarHora("2026-06-30T02:30:00.000Z")).toBe("23:30");
   });
 });
