@@ -25,7 +25,42 @@ function reaisParaCentavos(texto: string): number {
   return Math.round(reais * 100);
 }
 
-export function NovaEntrada() {
+interface BotaoVoltarProps {
+  onVoltar: () => void;
+}
+
+// Componente de módulo (não aninhado) — estável entre renders. Recebe o
+// callback por prop, então serve tanto o header quanto os estados de borda.
+function BotaoVoltar({ onVoltar }: BotaoVoltarProps) {
+  return (
+    <button
+      type="button"
+      onClick={onVoltar}
+      aria-label="Voltar"
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition hover:bg-muted"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+    </button>
+  );
+}
+
+interface NovaEntradaProps {
+  onVoltar: () => void;
+}
+
+export function NovaEntrada({ onVoltar }: NovaEntradaProps) {
   const atendentes = useAtendentes();
   const servicos = useServicos();
   const criarEntrada = useCriarEntrada();
@@ -64,17 +99,23 @@ export function NovaEntrada() {
 
   if (carregando) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Carregando…</p>
+      <div className="mx-auto max-w-md p-4">
+        <BotaoVoltar onVoltar={onVoltar} />
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <p>Carregando…</p>
+        </div>
       </div>
     );
   }
 
   if (comErro) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-        <p>Não foi possível carregar os dados. Verifique a conexão.</p>
-        <button onClick={tentarNovamente}>Tentar novamente</button>
+      <div className="mx-auto max-w-md p-4">
+        <BotaoVoltar onVoltar={onVoltar} />
+        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
+          <p>Não foi possível carregar os dados. Verifique a conexão.</p>
+          <button onClick={tentarNovamente}>Tentar novamente</button>
+        </div>
       </div>
     );
   }
@@ -145,7 +186,10 @@ export function NovaEntrada() {
 
   return (
     <div className="mx-auto max-w-md p-4 pb-24">
-      <h1 className="text-xl font-semibold">Nova Entrada</h1>
+      <div className="flex items-center gap-3">
+        <BotaoVoltar onVoltar={onVoltar} />
+        <h1 className="text-xl font-semibold">Nova Entrada</h1>
+      </div>
 
       {/* CAMPO 1: Atendente */}
       <section className="mt-6">
