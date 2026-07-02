@@ -1,7 +1,7 @@
 // Orquestrador da Entradas de hoje. Lê a lista do dia + o resumo
 // (chips de barbeiro, sempre os 3 com zero-fill) e escolhe o estado a
-// renderizar. Família "balcão": projeção operacional, sem R$. Loading e
-// erro entram em fatia posterior.
+// renderizar. Família "balcão": projeção operacional, sem R$.
+// Estados: erro (com retry) > loading (skeleton) > vazio > lista.
 
 import { useMemo } from "react";
 import { useEntradasHoje } from "../use-entradas-hoje";
@@ -10,6 +10,8 @@ import { encontrarLider } from "../encontrar-lider";
 import { useResumo } from "@/features/dashboard/use-resumo";
 import { EntradaItem } from "./entrada-item";
 import { BarraInferiorHoje } from "./barra-inferior-hoje";
+import { EntradasHojeSkeleton } from "./entradas-hoje-skeleton.tsx";
+import { EntradasHojeErro } from "./entradas-hoje-erro.tsx";
 
 interface EntradasHojeProps {
   onVoltar: () => void;
@@ -17,11 +19,13 @@ interface EntradasHojeProps {
 }
 
 export function EntradasHoje({ onVoltar, onNovaEntrada }: EntradasHojeProps) {
-  const { data: entradas } = useEntradasHoje();
-  const { data: resumo } = useResumo();
+  const entradasQuery = useEntradasHoje();
+  const resumoQuery = useResumo();
+  const { data: entradas } = entradasQuery;
+  const { data: resumo } = resumoQuery;
 
   // Hooks SEMPRE no topo, antes de qualquer return condicional (rules-of-hooks).
-  // `?? []` evita undefined no loading; o early-return abaixo descarta o render.
+  // `?? []` evita undefined no loading; os early-returns abaixo descartam o render.
   const { selecionado, setSelecionado, entradasFiltradas } = useFiltroBarbeiro(
     entradas ?? [],
   );
@@ -34,8 +38,27 @@ export function EntradasHoje({ onVoltar, onNovaEntrada }: EntradasHojeProps) {
     [resumo?.porBarbeiro],
   );
 
-  // Espera as DUAS queries (lista + resumo). Loading caprichado vem depois.
-  if (!entradas || !resumo) return null;
+  // Cascata de estados. Erro primeiro (se falhou, não faz sentido skeleton);
+  // depois loading; só então o conteúdo. Retry refaz as DUAS queries.
+  if (entradasQuery.isError || resumoQuery.isError) {
+    return (
+      <EntradasHojeErro
+        onRetry={() => {
+          entradasQuery.refetch();
+          resumoQuery.refetch();
+        }}
+      />
+    );
+  }
+
+  if (
+    entradasQuery.isLoading ||
+    resumoQuery.isLoading ||
+    !entradas ||
+    !resumo
+  ) {
+    return <EntradasHojeSkeleton />;
+  }
 
   return (
     <div className="mx-auto flex h-dvh max-w-md flex-col bg-zinc-950 px-4 py-3 text-zinc-100">
