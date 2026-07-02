@@ -3,8 +3,10 @@
 // renderizar. Família "balcão": projeção operacional, sem R$. Loading e
 // erro entram em fatia posterior.
 
+import { useMemo } from "react";
 import { useEntradasHoje } from "../use-entradas-hoje";
 import { useFiltroBarbeiro } from "../use-filtro-barbeiro";
+import { encontrarLider } from "../encontrar-lider";
 import { useResumo } from "@/features/dashboard/use-resumo";
 import { EntradaItem } from "./entrada-item";
 import { BarraInferiorHoje } from "./barra-inferior-hoje";
@@ -22,6 +24,14 @@ export function EntradasHoje({ onVoltar, onNovaEntrada }: EntradasHojeProps) {
   // `?? []` evita undefined no loading; o early-return abaixo descarta o render.
   const { selecionado, setSelecionado, entradasFiltradas } = useFiltroBarbeiro(
     entradas ?? [],
+  );
+
+  // Líder do dia: barbeiro com estritamente mais entradas. Empate (inclui o
+  // 0-0-0 do início do dia) => null, ninguém destacado. Deriva da mesma fonte
+  // dos chips; `?? []` mantém o hook estável durante o loading.
+  const liderId = useMemo(
+    () => encontrarLider(resumo?.porBarbeiro ?? []),
+    [resumo?.porBarbeiro],
   );
 
   // Espera as DUAS queries (lista + resumo). Loading caprichado vem depois.
@@ -64,27 +74,45 @@ export function EntradasHoje({ onVoltar, onNovaEntrada }: EntradasHojeProps) {
           >
             Todos
           </button>
-          {resumo.porBarbeiro.map((b) => (
-            <button
-              key={b.atendenteId}
-              type="button"
-              onClick={() => setSelecionado(b.atendenteId)}
-              className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
-                selecionado === b.atendenteId
-                  ? "bg-amber-500 text-zinc-950"
-                  : "bg-zinc-900 text-zinc-400"
-              }`}
-            >
-              {b.nome}{" "}
-              <span
-                className={
-                  selecionado === b.atendenteId ? "opacity-70" : "opacity-50"
-                }
+          {resumo.porBarbeiro.map((b) => {
+            const ativo = selecionado === b.atendenteId;
+            const lider = b.atendenteId === liderId;
+
+            // Precedência visual: seleção (ação do usuário) manda no fundo
+            // amber sólido. Líder não-selecionado ganha destaque sutil (anel +
+            // texto amber), nunca o mesmo sólido, para não colidir com a seleção.
+            const estilo = ativo
+              ? "bg-amber-500 text-zinc-950"
+              : lider
+                ? "bg-zinc-900 text-amber-400 ring-1 ring-amber-500/40"
+                : "bg-zinc-900 text-zinc-400";
+
+            return (
+              <button
+                key={b.atendenteId}
+                type="button"
+                onClick={() => setSelecionado(b.atendenteId)}
+                className={`flex items-center gap-1 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${estilo}`}
               >
-                {b.quantidade}
-              </span>
-            </button>
-          ))}
+                {lider && (
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    className="-ml-0.5"
+                  >
+                    <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm0 2h14v2H5v-2z" />
+                  </svg>
+                )}
+                {b.nome}{" "}
+                <span className={ativo ? "opacity-70" : "opacity-50"}>
+                  {b.quantidade}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </header>
 
