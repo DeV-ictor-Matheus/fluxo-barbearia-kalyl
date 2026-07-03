@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useResumo } from "../use-resumo";
 import { BalcaoMode } from "./balcao-mode";
 import { DashboardSkeleton } from "./dashboard-skeleton";
@@ -31,6 +32,7 @@ interface DashboardProps {
 export function Dashboard({ onEntradasHoje }: DashboardProps) {
   const { data: resumo, isPending, isError, refetch } = useResumo();
   const [menuAberto, setMenuAberto] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="mx-auto flex h-dvh max-w-md flex-col bg-zinc-950 px-4 py-3 text-zinc-100">
@@ -91,6 +93,7 @@ export function Dashboard({ onEntradasHoje }: DashboardProps) {
         aberto={menuAberto}
         onFechar={() => setMenuAberto(false)}
         onEntradasHoje={onEntradasHoje}
+        onRelatorio={() => navigate("/relatorio")}
       />
     </div>
   );

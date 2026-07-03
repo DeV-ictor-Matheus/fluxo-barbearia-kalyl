@@ -7,12 +7,14 @@ interface MenuSheetProps {
   aberto: boolean;
   onFechar: () => void;
   onEntradasHoje: () => void;
+  onRelatorio: () => void;
 }
 
 export function MenuSheet({
   aberto,
   onFechar,
   onEntradasHoje,
+  onRelatorio,
 }: MenuSheetProps) {
   return (
     <div
@@ -97,19 +99,25 @@ export function MenuSheet({
           Administração
         </span>
 
-        {/* Slot Owner — estático, bloqueado até o Auth (Fase 7) */}
-        <div className="flex w-full items-center gap-3.5 rounded-xl border border-zinc-900 p-3.5 opacity-75">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-zinc-800">
+        {/* Modo Owner — leva ao Relatório, protegido por login (backend valida) */}
+        <button
+          type="button"
+          onClick={() => {
+            onFechar();
+            onRelatorio();
+          }}
+          className="flex w-full items-center gap-3.5 rounded-xl border border-zinc-800 bg-zinc-800/60 p-3.5 text-left transition-colors hover:bg-zinc-800"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-amber-950">
             <svg
               width="19"
               height="19"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor"
+              stroke="#ef9f27"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-zinc-600"
               aria-hidden="true"
             >
               <rect x="3" y="11" width="18" height="11" rx="2" />
@@ -117,17 +125,28 @@ export function MenuSheet({
             </svg>
           </span>
           <span className="flex-1">
-            <span className="block text-[15px] font-medium text-zinc-400">
+            <span className="block text-[15px] font-medium text-zinc-100">
               Modo Owner
             </span>
-            <span className="mt-0.5 block text-[12px] text-zinc-600">
+            <span className="mt-0.5 block text-[12px] text-zinc-500">
               Financeiro e relatórios
             </span>
           </span>
-          <span className="rounded-md border border-zinc-800 bg-zinc-800 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
-            Em breve
-          </span>
-        </div>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-zinc-600"
+            aria-hidden="true"
+          >
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
       </div>
     </div>
   );
