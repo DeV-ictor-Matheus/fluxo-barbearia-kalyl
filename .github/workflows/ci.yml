@@ -35,10 +35,15 @@ jobs:
         run: npm ci
 
       # 4. Gera o Prisma Client (precisa existir pra o código compilar).
+      #    O generate NÃO conecta no banco — só valida a config — então
+      #    URLs dummy bastam. O Prisma 7 lê DATABASE_URL (adapter, runtime)
+      #    e DIRECT_URL (config, migrations); ambas precisam existir aqui,
+      #    mesmo que falsas, senão o config estoura PrismaConfigEnvError.
       - name: Gerar Prisma Client
         run: npx prisma generate
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
+          DIRECT_URL: "postgresql://user:pass@localhost:5432/db"
 
       # 5. Verifica o estilo e as boas práticas do código.
       - name: Rodar o lint
@@ -49,8 +54,15 @@ jobs:
         run: npm run type-check
 
       # 7. Roda os testes. Se algum falhar, o workflow falha (fica vermelho).
+      #    Envs dummy garantem que qualquer módulo importado durante a suíte
+      #    (ex.: db.ts, requireAuth.ts) resolva suas variáveis sem quebrar
+      #    no import. Os testes são de funções puras e não tocam a rede.
       - name: Rodar os testes
         run: npm test
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
+          DIRECT_URL: "postgresql://user:pass@localhost:5432/db"
+          SUPABASE_URL: "https://dummy.supabase.co"
 
   # Job do frontend. Sem Prisma e sem banco — o front não tem nada disso.
   frontend:
