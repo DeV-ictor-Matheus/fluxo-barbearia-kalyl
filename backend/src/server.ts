@@ -13,6 +13,7 @@ import { AppError } from "./errors/app-errors.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import { criarServicoSchema } from "./schemas/servicoSchema.js";
 import { parseDataQuery } from "./lib/parseDataQuery.js";
+import { requireAuth } from "./middlewares/requireAuth.js";
 
 const app = express();
 
@@ -119,6 +120,15 @@ app.post("/servicos", async (req, res) => {
 app.get("/servicos", async (req, res) => {
   const servicos = await prisma.servico.findMany();
   res.json(servicos);
+});
+
+// Relatório do dono. Protegido por requireAuth: só acessível com um JWT
+// válido do Supabase. Escopo mínimo nesta fatia — prova a proteção; a
+// lógica financeira completa entra na fatia da tela de Relatório.
+app.get("/relatorio", requireAuth, (req, res) => {
+  res
+    .status(200)
+    .json({ ok: true, mensagem: "Acesso autorizado ao relatório" });
 });
 
 app.use(errorHandler);
