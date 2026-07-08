@@ -14,6 +14,8 @@ import { errorHandler } from "./middlewares/error-handler.js";
 import { criarServicoSchema } from "./schemas/servicoSchema.js";
 import { parseDataQuery } from "./lib/parseDataQuery.js";
 import { requireAuth } from "./middlewares/requireAuth.js";
+import { parseIntervaloQuery } from "./lib/parseIntervaloQuery.js";
+import { relatorioFinanceiro } from "./services/relatorioFinanceiro.js";
 
 const app = express();
 
@@ -122,13 +124,15 @@ app.get("/servicos", async (req, res) => {
   res.json(servicos);
 });
 
-// Relatório do dono. Protegido por requireAuth: só acessível com um JWT
-// válido do Supabase. Escopo mínimo nesta fatia — prova a proteção; a
-// lógica financeira completa entra na fatia da tela de Relatório.
-app.get("/relatorio", requireAuth, (req, res) => {
-  res
-    .status(200)
-    .json({ ok: true, mensagem: "Acesso autorizado ao relatório" });
+// Relatório financeiro do dono. Protegido por requireAuth: só acessível com
+// um JWT válido do Supabase. parseIntervaloQuery valida a query e monta o
+// período (dia único, intervalo, ou default hoje); relatorioFinanceiro
+// orquestra as queries e agrega. Erros de query inválida viram AppError(400)
+// capturado pelo errorHandler — sem try/catch (Express 5 captura o throw async).
+app.get("/relatorio", requireAuth, async (req, res) => {
+  const params = parseIntervaloQuery(req.query);
+  const relatorio = await relatorioFinanceiro(params);
+  res.status(200).json(relatorio);
 });
 
 app.use(errorHandler);
