@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import App from "@/App";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
-import { RelatorioPlaceholder } from "@/features/relatorio/components/relatorio-placeholder";
+import { Relatorio } from "@/features/relatorio/components/relatorio";
 
 export function AppRoutes() {
   return (
@@ -14,7 +14,7 @@ export function AppRoutes() {
         path="/relatorio"
         element={
           <ProtectedRoute>
-            <RelatorioPlaceholder />
+            <Relatorio />
           </ProtectedRoute>
         }
       />
