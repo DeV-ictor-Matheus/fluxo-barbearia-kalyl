@@ -1,14 +1,23 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRelatorio } from "../use-relatorio";
+import { SeletorPeriodo } from "../seletor-periodo";
 import { hojeBrasilia } from "@/lib/hoje-brasilia";
+import { rotuloPeriodo } from "@/lib/rotulo-periodo";
+import { formatarCentavos } from "@/lib/format";
+import type { Periodo } from "@/types/relatorio";
 import { CardLiquido } from "./card-liquido";
 import { BarbeiroLinha } from "./barbeiro-linha";
 import { SaidasLista } from "./saidas-lista";
 
 export function Relatorio() {
   const navigate = useNavigate();
-  // Período fixo em "hoje" nesta fatia. O seletor de período vem na 5b.4.
-  const periodo = { tipo: "dia" as const, dia: hojeBrasilia() };
+  const [periodo, setPeriodo] = useState<Periodo>({
+    tipo: "dia",
+    dia: hojeBrasilia(),
+  });
+  const [seletorAberto, setSeletorAberto] = useState(false);
+  // A queryKey do useRelatorio inclui o periodo; trocar o estado revalida sozinho.
   const { data, isPending, isError, refetch } = useRelatorio(periodo);
 
   return (
@@ -35,6 +44,44 @@ export function Relatorio() {
           </svg>
         </button>
         <h1 className="text-lg font-semibold">Relatório</h1>
+
+        {/* Pill de período — tonal amber, abre o seletor. */}
+        <button
+          type="button"
+          onClick={() => setSeletorAberto(true)}
+          className="ml-auto flex items-center gap-2 rounded-full bg-amber-950 py-2 pl-3.5 pr-3 transition-colors hover:bg-amber-900"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fac775"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+          <span className="max-w-[9rem] truncate text-[13px] font-medium text-amber-200">
+            {rotuloPeriodo(periodo)}
+          </span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#eab308"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
       </header>
 
       {isPending ? (
@@ -50,6 +97,7 @@ export function Relatorio() {
             Verifique a conexão e tente de novo.
           </p>
           <button
+            type="button"
             onClick={() => refetch()}
             className="mt-1 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-amber-400"
           >
@@ -77,18 +125,22 @@ export function Relatorio() {
 
           <section>
             <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-zinc-500">
-              Saídas · {formatarSaidasTotal(data.saidas.total)}
+              Saídas · {formatarCentavos(data.saidas.total)}
             </h2>
             <SaidasLista saidas={data.saidas} />
           </section>
         </div>
       )}
+
+      <SeletorPeriodo
+        aberto={seletorAberto}
+        periodo={periodo}
+        onFechar={() => setSeletorAberto(false)}
+        onAplicar={(novo) => {
+          setPeriodo(novo);
+          setSeletorAberto(false);
+        }}
+      />
     </div>
   );
-}
-
-// Import local pra evitar poluir o topo; formatarCentavos já vem do lib.
-import { formatarCentavos } from "@/lib/format";
-function formatarSaidasTotal(centavos: number): string {
-  return formatarCentavos(centavos);
 }
