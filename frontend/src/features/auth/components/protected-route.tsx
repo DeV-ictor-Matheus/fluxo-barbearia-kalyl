@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../use-auth";
 import { LoginForm } from "./login-form";
 
@@ -9,7 +8,6 @@ type ProtectedRouteProps = {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { session, loading } = useAuth();
-  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -42,42 +40,15 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
                   <path d="M7 11V7a5 5 0 0110 0v4" />
                 </svg>
               </span>
-              <div className="text-center">
-                <h1 className="text-lg font-semibold text-zinc-100">
-                  Acesso ao Relatório
-                </h1>
-                <p className="mt-1 text-[13px] text-zinc-500">
-                  Área restrita ao dono
-                </p>
-              </div>
+              <h1 className="text-lg font-semibold text-zinc-100">
+                Fluxo Barbearia Kalyl
+              </h1>
+              <p className="mt-1 text-[13px] text-zinc-500">
+                Acesso restrito à equipe
+              </p>
             </div>
-
             <LoginForm />
           </div>
-        </div>
-
-        {/* Rodapé: saída ancorada, sempre no mesmo lugar */}
-        <div className="border-t border-zinc-800 px-4 py-3">
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 text-[15px] font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            Voltar à tela de entradas
-          </button>
         </div>
       </div>
     );

@@ -6,10 +6,17 @@ import { Relatorio } from "@/features/relatorio/components/relatorio";
 export function AppRoutes() {
   return (
     <Routes>
-      {/* App público: o orquestrador de telas por estado (Dashboard, Nova Entrada, Entradas de hoje) */}
-      <Route path="/" element={<App />} />
+      {/* Toda a API exige JWT — o app inteiro fica atrás de login.
+          Conta única de balcão, sem distinção de papel. */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <App />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* Relatório: acesso restrito ao dono. A proteção real de dados fica no backend (fatia futura) */}
       <Route
         path="/relatorio"
         element={
