@@ -7,7 +7,7 @@ const supabaseUrl = process.env.SUPABASE_URL;
 
 if (!supabaseUrl) {
   throw new Error(
-    "SUPABASE_URL ausente no .env — necessário para validar o acesso ao relatório",
+    "SUPABASE_URL ausente no .env — necessário para validar o acesso à API",
   );
 }
 
@@ -17,9 +17,10 @@ const JWKS = createRemoteJWKSet(
   new URL(`${supabaseUrl}/auth/v1/.well-known/jwks.json`),
 );
 
-// Porteiro das rotas do dono. Exige um JWT válido do Supabase no header
-// Authorization. Como o cadastro público está desligado, o único usuário
-// possível é o dono — token válido = acesso do dono liberado.
+// Porteiro de toda a API (exceto o healthcheck GET /). Exige um JWT válido
+// do Supabase no header Authorization. Conta única de balcão: token válido
+// = alguém da equipe, sem distinção de papel. A separação balcão/dono
+// (dois níveis) é débito de v2 — ver ADR de segurança.
 export async function requireAuth(
   req: Request,
   _res: Response,
