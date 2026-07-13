@@ -19,10 +19,9 @@ import { relatorioFinanceiro } from "./services/relatorioFinanceiro.js";
 
 const app = express();
 
-// permite que o servidor entenda JSON no corpo das requisições
 app.use(express.json());
 
-app.get("/saidas", async (req, res) => {
+app.get("/saidas", requireAuth, async (req, res) => {
   const saidas = await listarSaidas();
   res.status(200).json(saidas);
 });
@@ -32,7 +31,7 @@ app.get("/", (req, res) => {
   res.json({ status: "ok", mensagem: "API da Barbearia rodando" });
 });
 
-app.patch("/saidas/:id", async (req, res) => {
+app.patch<{ id: string }>("/saidas/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
 
   // Rejeita corpo vazio ANTES de validar (evita .default mascarar body vazio)
@@ -46,7 +45,7 @@ app.patch("/saidas/:id", async (req, res) => {
 });
 
 // resumo do dia para o Dashboard balcão (total + por barbeiro, SEM R$)
-app.get("/entradas/resumo", async (req, res) => {
+app.get("/entradas/resumo", requireAuth, async (req, res) => {
   const data = parseDataQuery(req.query.data);
 
   const resumo = await resumoEntradas(data);
@@ -55,7 +54,7 @@ app.get("/entradas/resumo", async (req, res) => {
 
 // lista as entradas de um dia (default: hoje em Brasília), da mais recente
 // para a mais antiga — base da Tela G (Entradas de hoje).
-app.get("/entradas", async (req, res) => {
+app.get("/entradas", requireAuth, async (req, res) => {
   const data = parseDataQuery(req.query.data);
 
   const entradas = await listarEntradas(data);
@@ -63,7 +62,7 @@ app.get("/entradas", async (req, res) => {
 });
 
 // endpoint que registra uma entrada
-app.post("/entradas", async (req, res) => {
+app.post("/entradas", requireAuth, async (req, res) => {
   // Valida e extrai os dados já tipados. Se o formato falhar, lança
   // ZodError; se uma regra de negócio falhar (desconto > 50%, etc.),
   // registrarEntrada lança AppError. Ambos sobem pro errorHandler central.
@@ -72,7 +71,7 @@ app.post("/entradas", async (req, res) => {
   res.status(201).json(entrada);
 });
 
-app.post("/saidas", async (req, res) => {
+app.post("/saidas", requireAuth, async (req, res) => {
   // 1. O PORTEIRO: valida o corpo da requisição antes de tudo.
   const resultado = criarSaidaSchema.safeParse(req.body);
 
@@ -95,7 +94,7 @@ app.post("/saidas", async (req, res) => {
 });
 
 // cadastrar um atendente
-app.post("/atendentes", async (req, res) => {
+app.post("/atendentes", requireAuth, async (req, res) => {
   try {
     const atendente = await prisma.atendente.create({ data: req.body });
     res.status(201).json(atendente);
@@ -106,20 +105,20 @@ app.post("/atendentes", async (req, res) => {
 });
 
 // listar atendentes
-app.get("/atendentes", async (req, res) => {
+app.get("/atendentes", requireAuth, async (req, res) => {
   const atendentes = await prisma.atendente.findMany();
   res.json(atendentes);
 });
 
 // cadastrar um serviço
-app.post("/servicos", async (req, res) => {
+app.post("/servicos", requireAuth, async (req, res) => {
   const dados = criarServicoSchema.parse(req.body);
   const servico = await prisma.servico.create({ data: dados });
   res.status(201).json(servico);
 });
 
 // listar serviços
-app.get("/servicos", async (req, res) => {
+app.get("/servicos", requireAuth, async (req, res) => {
   const servicos = await prisma.servico.findMany();
   res.json(servicos);
 });
