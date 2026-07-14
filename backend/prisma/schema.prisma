@@ -25,7 +25,8 @@ model Servico {
   id                     String @id @default(uuid())
   nome                   String
   precoCasaCentavos      Int
-  precoParceiro2Centavos Int
+  /// null = serviço sem tabela do parceiro; cobra-se o preço da casa.
+  precoParceiro2Centavos Int?
 
   entradas Entrada[]
 }
