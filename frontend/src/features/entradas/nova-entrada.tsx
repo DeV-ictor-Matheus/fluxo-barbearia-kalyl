@@ -130,11 +130,12 @@ export function NovaEntrada({ onVoltar }: NovaEntradaProps) {
     // Mesmo predicado do resolvePreco no backend. O front só ESPELHA para
     // exibir o número certo; a verdade financeira é recalculada no POST.
     // precoParceiro2Centavos null = serviço sem tabela do parceiro → casa.
+    // Extrai a propriedade para uma const local: o narrowing do TS não flui
+    // através de `servico.prop` entre a checagem e o uso (config do CI).
+    const precoParceiro2 = servico.precoParceiro2Centavos;
     const usaTabelaParceiro2 =
-      ehParceiro2 && clienteProprio && servico.precoParceiro2Centavos !== null;
-    return usaTabelaParceiro2
-      ? servico.precoParceiro2Centavos
-      : servico.precoCasaCentavos;
+      ehParceiro2 && clienteProprio && precoParceiro2 !== null;
+    return usaTabelaParceiro2 ? precoParceiro2 : servico.precoCasaCentavos;
   }
 
   const precoAtual = servicoSelecionado ? precoExibido(servicoSelecionado) : 0;
