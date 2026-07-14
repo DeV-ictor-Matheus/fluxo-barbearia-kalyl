@@ -16,6 +16,8 @@ import { parseDataQuery } from "./lib/parseDataQuery.js";
 import { requireAuth } from "./middlewares/requireAuth.js";
 import { parseIntervaloQuery } from "./lib/parseIntervaloQuery.js";
 import { relatorioFinanceiro } from "./services/relatorioFinanceiro.js";
+import { criarAtendenteSchema } from "./schemas/atendenteSchema.js";
+import { Prisma } from "@prisma/client";
 
 const app = express();
 
@@ -94,13 +96,25 @@ app.post("/saidas", requireAuth, async (req, res) => {
 });
 
 // cadastrar um atendente
-app.post("/atendentes", requireAuth, async (req, res) => {
+app.post("/atendentes", requireAuth, async (req, res, next) => {
   try {
-    const atendente = await prisma.atendente.create({ data: req.body });
+    const dados = criarAtendenteSchema.parse(req.body);
+
+    const atendente = await prisma.atendente.create({ data: dados });
     res.status(201).json(atendente);
   } catch (erro) {
-    const mensagem = erro instanceof Error ? erro.message : "Erro desconhecido";
-    res.status(400).json({ erro: mensagem });
+    // P2002 = violação de unique constraint. Aqui só existe um índice único
+    // relevante: atendente_dono_unico. Traduz para 409 (conflito de estado),
+    // não 400 (payload malformado) — o corpo estava correto, o mundo é que não permite.
+    if (
+      erro instanceof Prisma.PrismaClientKnownRequestError &&
+      erro.code === "P2002"
+    ) {
+      return res
+        .status(409)
+        .json({ erro: "Já existe um dono ativo cadastrado" });
+    }
+    next(erro);
   }
 });
 
