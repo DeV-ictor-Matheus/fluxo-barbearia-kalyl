@@ -38,12 +38,22 @@ export async function registrarEntrada(dados: CriarEntradaInput) {
     throw new Error("Serviço não encontrado.");
   }
 
-  // qual preço usar depende da tabela aplicada (casa ou parceiro2)
-  const tabelaAplicada = papel === "parceiro2" ? "parceiro2" : "casa";
-  const valorServicoCentavos =
-    tabelaAplicada === "parceiro2"
-      ? servico.precoParceiro2Centavos
-      : servico.precoCasaCentavos;
+  // 3. RESOLVER O PREÇO. A tabela do parceiro2 só vale quando ele traz o
+  // cliente; em walk-in ele atende pela tabela da casa. Mesmo predicado de
+  // calcularDivisao — precificação e divisão andam sempre juntas.
+  // precoParceiro2Centavos null = serviço sem tabela própria → cobra a da casa.
+  // Extrai a propriedade para uma const local: o narrowing do TS não flui
+  // através de um booleano intermediário quando o alvo é `obj.prop`.
+  const precoParceiro2 = servico.precoParceiro2Centavos;
+
+  const usaTabelaParceiro =
+    papel === "parceiro2" && dados.clienteProprio && precoParceiro2 !== null;
+
+  const tabelaAplicada = usaTabelaParceiro ? "parceiro2" : "casa";
+
+  const valorServicoCentavos = usaTabelaParceiro
+    ? precoParceiro2
+    : servico.precoCasaCentavos;
 
   // 3. TETO DO DESCONTO (50% do preço). Regra de domínio: depende do preço,
   // por isso não cabe no Zod. Math.floor mantém o teto em centavos inteiros.
