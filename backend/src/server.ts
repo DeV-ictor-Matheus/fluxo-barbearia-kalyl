@@ -17,7 +17,7 @@ import { requireAuth } from "./middlewares/requireAuth.js";
 import { parseIntervaloQuery } from "./lib/parseIntervaloQuery.js";
 import { relatorioFinanceiro } from "./services/relatorioFinanceiro.js";
 import { criarAtendenteSchema } from "./schemas/atendenteSchema.js";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "./generated/prisma/client.js";
 
 const app = express();
 
