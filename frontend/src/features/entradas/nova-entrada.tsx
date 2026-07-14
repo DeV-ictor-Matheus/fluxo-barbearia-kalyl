@@ -127,7 +127,11 @@ export function NovaEntrada({ onVoltar }: NovaEntradaProps) {
   const servicoSelecionado = servicos.data?.find((s) => s.id === servicoId);
 
   function precoExibido(servico: Servico): number {
-    const usaTabelaParceiro2 = ehParceiro2 && clienteProprio;
+    // Mesmo predicado do resolvePreco no backend. O front só ESPELHA para
+    // exibir o número certo; a verdade financeira é recalculada no POST.
+    // precoParceiro2Centavos null = serviço sem tabela do parceiro → casa.
+    const usaTabelaParceiro2 =
+      ehParceiro2 && clienteProprio && servico.precoParceiro2Centavos !== null;
     return usaTabelaParceiro2
       ? servico.precoParceiro2Centavos
       : servico.precoCasaCentavos;
@@ -255,7 +259,16 @@ export function NovaEntrada({ onVoltar }: NovaEntradaProps) {
 
       {/* CAMPO 3: Serviço */}
       <section className="mt-6">
-        <label className="text-sm font-medium">Serviço</label>
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium">Serviço</label>
+          {ehParceiro2 && (
+            <span className="text-xs text-muted-foreground">
+              {clienteProprio
+                ? `tabela do ${atendenteSelecionado?.nome}`
+                : "tabela da casa"}
+            </span>
+          )}
+        </div>
         <div className="mt-2 flex flex-col gap-2">
           {servicos.data?.map((servico) => {
             const selecionado = servico.id === servicoId;

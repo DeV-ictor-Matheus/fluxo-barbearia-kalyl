@@ -7,5 +7,6 @@ export interface Servico {
   id: string;
   nome: string;
   precoCasaCentavos: number;
-  precoParceiro2Centavos: number;
+  /// null = serviço sem tabela do parceiro2; cobra-se o preço da casa.
+  precoParceiro2Centavos: number | null;
 }
