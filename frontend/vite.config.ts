@@ -48,6 +48,22 @@ export default defineConfig({
             purpose: "maskable",
           },
         ],
+        screenshots: [
+          {
+            src: "/screenshot-dashboard.png",
+            sizes: "780x1688",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Painel do dia da barbearia",
+          },
+          {
+            src: "/screenshot-nova-entrada.png",
+            sizes: "780x1688",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Lançamento de atendimento",
+          },
+        ],
       },
       workbox: {
         // ADR-003: só precache do app shell. NENHUM runtimeCaching — nenhuma
