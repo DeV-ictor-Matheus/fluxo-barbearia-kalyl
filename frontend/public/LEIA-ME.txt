@@ -1,0 +1,29 @@
+ÍCONES PWA — BARBEARIA KALYL
+============================
+
+Gerados a partir de LOGO-FINAL.svg (fundo #13100E, medido da própria arte).
+
+CONTEÚDO
+  icon-192.png            192x192   ícone padrão (launcher)          purpose: any
+  icon-512.png            512x512   ícone padrão grande              purpose: any
+  icon-maskable-192.png   192x192   safe zone 80% (Android recorta)  purpose: maskable
+  icon-maskable-512.png   512x512   safe zone 80%                    purpose: maskable
+  apple-touch-icon.png    180x180   iOS (sem alpha, iOS arredonda)
+  favicon-32.png           32x32    aba do navegador
+  favicon-48.png           48x48    aba do navegador
+  favicon.ico            multi-res  16/32/48 — favicon clássico
+
+NOTAS
+  - any x maskable são DOIS conjuntos separados de propósito. O maskable tem
+    respiro extra (logo a 70% do canvas) para o recorte circular/squircle não
+    cortar a arte. Verificado: 0% de conteúdo na zona de corte.
+  - Cor de tema e de fundo do manifest: #13100E (não é preto puro; é o
+    near-black quente da logo). Usar exatamente esse valor evita costura no
+    splash screen.
+  - favicon e apple-touch usam o glifo "K" isolado — a logo inteira vira
+    borrão abaixo de ~64px.
+
+O QUE FALTA (v2)
+  - Logo transparente para header/login: não incluída. O SVG tem a ilustração
+    do barbeiro como raster mascarado que quebra ao remover o fundo. Precisa
+    de PNG transparente exportado do CorelDRAW pelo designer.
