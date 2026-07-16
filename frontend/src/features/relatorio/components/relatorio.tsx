@@ -148,7 +148,7 @@ export function Relatorio() {
       <button
         type="button"
         onClick={() => navigate("/nova-saida")}
-        className="mt-3 flex shrink-0 items-center justify-center gap-2 rounded-lg bg-amber-500 py-3 text-sm font-semibold text-zinc-950 transition-colors hover:bg-amber-400"
+        className="mt-auto flex shrink-0 items-center justify-center gap-2 rounded-lg bg-amber-500 py-3 text-sm font-semibold text-zinc-950 transition-colors hover:bg-amber-400"
       >
         <svg
           width="18"
