@@ -4,6 +4,7 @@
 // várias saídas da mesma competência em sequência).
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ptBR } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
@@ -90,11 +91,8 @@ function BotaoVoltar({ onVoltar }: BotaoVoltarProps) {
   );
 }
 
-interface NovaSaidaProps {
-  onVoltar: () => void;
-}
-
-export function NovaSaida({ onVoltar }: NovaSaidaProps) {
+export function NovaSaida() {
+  const navigate = useNavigate();
   const criarSaida = useCriarSaida();
 
   // categoria começa "" = placeholder "Selecione…". Não é valor válido do
@@ -154,7 +152,7 @@ export function NovaSaida({ onVoltar }: NovaSaidaProps) {
   return (
     <div className="mx-auto max-w-md p-4 pb-24">
       <div className="flex items-center gap-3">
-        <BotaoVoltar onVoltar={onVoltar} />
+        <BotaoVoltar onVoltar={() => navigate("/relatorio")} />
         <h1 className="text-xl font-semibold">Nova Saída</h1>
       </div>
 
