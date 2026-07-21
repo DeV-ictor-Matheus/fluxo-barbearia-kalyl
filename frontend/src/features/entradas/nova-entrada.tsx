@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useAtendentes } from "@/features/atendentes/use-atendentes";
 import { useServicos } from "@/features/servicos/use-servicos";
 import { useCriarEntrada } from "./use-criar-entrada";
-import { formatarCentavos } from "@/lib/format";
+import { formatarCentavos, reaisParaCentavos } from "@/lib/format";
 import type { MetodoPagamento } from "@/types/entrada";
 import type { Servico } from "@/types/servico";
 
@@ -16,14 +16,6 @@ const PAGAMENTOS: { valor: MetodoPagamento; label: string }[] = [
   { valor: "cartao", label: "Cartão" },
   { valor: "dinheiro", label: "Dinheiro" },
 ];
-
-function reaisParaCentavos(texto: string): number {
-  const normalizado = texto.replace(",", ".").trim();
-  if (normalizado === "") return 0;
-  const reais = Number(normalizado);
-  if (Number.isNaN(reais) || reais < 0) return 0;
-  return Math.round(reais * 100);
-}
 
 interface BotaoVoltarProps {
   onVoltar: () => void;

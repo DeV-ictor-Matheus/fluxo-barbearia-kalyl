@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { reaisParaCentavos } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { dataParaISO, isoParaData } from "@/lib/data-iso";
 import { hojeBrasilia } from "@/lib/hoje-brasilia";
@@ -38,16 +39,6 @@ const CATEGORIAS: { valor: CategoriaSaida; label: string }[] = [
   { valor: "MARKETING", label: "Marketing" },
   { valor: "OUTROS", label: "Outros" },
 ];
-
-// Duplicada de propósito (a Tela E também a tem inline); extrair para @/lib
-// é débito de refactor, não desta fatia.
-function reaisParaCentavos(texto: string): number {
-  const normalizado = texto.replace(",", ".").trim();
-  if (normalizado === "") return 0;
-  const reais = Number(normalizado);
-  if (Number.isNaN(reais) || reais < 0) return 0;
-  return Math.round(reais * 100);
-}
 
 // Amber nas células selecionadas do Calendar — mesmo padrão do seletor-periodo.
 // Override via classNames (nunca tocar calendar.tsx nem os tokens globais).
