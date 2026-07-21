@@ -103,13 +103,11 @@ export function NovaSaida() {
   // Data como string ISO "YYYY-MM-DD" — é o que vai no payload (premissa do
   // rangeUtcPuro no backend: Saida.data nasce de string sem componente de hora).
   const [dataISO, setDataISO] = useState<string>(hojeBrasilia());
-  const [recorrente, setRecorrente] = useState(false);
   const [calendarioAberto, setCalendarioAberto] = useState(false);
 
   const valorCentavos = reaisParaCentavos(valorTexto);
 
-  // Trava do submit: categoria escolhida + valor > 0. Data já tem default,
-  // recorrente é boolean sempre definido.
+  // Trava do submit: categoria escolhida + valor > 0. Data já tem default.
   const podeEnviar =
     categoria !== "" && valorCentavos > 0 && !criarSaida.isPending;
 
@@ -128,7 +126,6 @@ export function NovaSaida() {
         valorCentavos,
         data: dataISO,
         descricao: descricao.trim() || undefined,
-        recorrente,
       },
       {
         onSuccess: () => {
@@ -138,7 +135,6 @@ export function NovaSaida() {
           setCategoria("");
           setValorTexto("");
           setDescricao("");
-          setRecorrente(false);
         },
         onError: () => {
           // Hook neutro: o componente roteia. Saída não tem erro de campo
@@ -249,36 +245,6 @@ export function NovaSaida() {
             />
           </PopoverContent>
         </Popover>
-      </section>
-
-      {/* CAMPO 5: Recorrente (toggle) */}
-      <section className="mt-6">
-        <button
-          type="button"
-          onClick={() => setRecorrente((r) => !r)}
-          aria-pressed={recorrente}
-          className="flex w-full items-center justify-between rounded-lg border border-border p-3 text-left transition hover:bg-muted"
-        >
-          <span>
-            <span className="block text-sm font-medium">
-              Despesa recorrente
-            </span>
-            <span className="block text-xs text-muted-foreground">
-              Apenas rótulo — sem automação
-            </span>
-          </span>
-          <span
-            className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-              recorrente ? "bg-[#ef9f27]" : "bg-muted"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-background transition-transform ${
-                recorrente ? "translate-x-[22px]" : "translate-x-0.5"
-              }`}
-            />
-          </span>
-        </button>
       </section>
 
       {/* Botão Lançar — fixo no rodapé. isPending trava (anti-duplicata). */}
