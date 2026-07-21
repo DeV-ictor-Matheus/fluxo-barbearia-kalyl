@@ -192,22 +192,7 @@ export function NovaSaida() {
         />
       </section>
 
-      {/* CAMPO 3: Descrição (opcional) */}
-      <section className="mt-6">
-        <label htmlFor="descricao" className="text-sm font-medium">
-          Descrição <span className="text-muted-foreground">(opcional)</span>
-        </label>
-        <input
-          id="descricao"
-          type="text"
-          placeholder="Ex: aluguel referente a junho"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-border bg-transparent p-3 text-sm"
-        />
-      </section>
-
-      {/* CAMPO 4: Data (competência) */}
+      {/* CAMPO 3: Data (competência) */}
       <section className="mt-6">
         <label className="text-sm font-medium">Data (competência)</label>
         <Popover open={calendarioAberto} onOpenChange={setCalendarioAberto}>
@@ -245,6 +230,21 @@ export function NovaSaida() {
             />
           </PopoverContent>
         </Popover>
+      </section>
+
+      {/* CAMPO 4: Descrição (opcional) */}
+      <section className="mt-6">
+        <label htmlFor="descricao" className="text-sm font-medium">
+          Descrição <span className="text-muted-foreground">(opcional)</span>
+        </label>
+        <input
+          id="descricao"
+          type="text"
+          placeholder="Ex: aluguel referente a junho"
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          className="mt-2 w-full rounded-lg border border-border bg-transparent p-3 text-sm"
+        />
       </section>
 
       {/* Botão Lançar — fixo no rodapé. isPending trava (anti-duplicata). */}
