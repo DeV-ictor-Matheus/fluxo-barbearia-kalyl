@@ -225,6 +225,9 @@ export function NovaSaida() {
               mode="single"
               selected={isoParaData(dataISO)}
               onSelect={selecionarData}
+              // Teto = hoje. Saída é fato consumado; despesa a vencer
+              // infla o Líquido de um mês que ainda não aconteceu.
+              disabled={{ after: isoParaData(hojeBrasilia()) }}
               locale={ptBR}
               className={AMBER_CELULAS}
             />
