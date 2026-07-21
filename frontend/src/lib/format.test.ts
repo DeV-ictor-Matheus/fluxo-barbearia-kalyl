@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { formatarCentavos, formatarHora } from "@/lib/format";
+import { reaisParaCentavos } from "@/lib/format";
 
 // Normaliza qualquer espaço (incluindo o non-breaking space \u00A0 e o
 // narrow no-break \u202F que o Intl pt-BR usa) para um espaço comum,
@@ -51,5 +52,31 @@ describe("formatarHora", () => {
     // 02:30 UTC do dia 30 = 23:30 BRT do dia 29. Prova que a conversão
     // de fuso considera a virada de data, não só subtrai 3 das horas.
     expect(formatarHora("2026-06-30T02:30:00.000Z")).toBe("23:30");
+  });
+});
+
+describe("reaisParaCentavos", () => {
+  it("converte reais com vírgula em centavos", () => {
+    expect(reaisParaCentavos("50,00")).toBe(5000);
+  });
+
+  it("converte reais com ponto em centavos", () => {
+    expect(reaisParaCentavos("50.00")).toBe(5000);
+  });
+
+  it("arredonda para o centavo mais próximo", () => {
+    expect(reaisParaCentavos("10,555")).toBe(1056);
+  });
+
+  it("devolve 0 para texto vazio", () => {
+    expect(reaisParaCentavos("")).toBe(0);
+  });
+
+  it("devolve 0 para texto não numérico", () => {
+    expect(reaisParaCentavos("abc")).toBe(0);
+  });
+
+  it("devolve 0 para valor negativo", () => {
+    expect(reaisParaCentavos("-10")).toBe(0);
   });
 });

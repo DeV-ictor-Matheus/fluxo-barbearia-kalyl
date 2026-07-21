@@ -1,5 +1,6 @@
-// Formatação de exibição. Centraliza conversões de dado → texto para que a
-// regra apareça em um lugar só (centavos viram Real aqui, e em nenhum outro).
+// Conversões de dinheiro e tempo entre dado e texto, nos dois sentidos.
+// Centraliza a regra em um lugar só: centavos viram Real aqui (e em nenhum
+// outro), e texto do usuário vira centavos aqui (e em nenhum outro).
 
 /**
  * Converte centavos inteiros em moeda brasileira para exibição.
@@ -30,4 +31,24 @@ export function formatarHora(iso: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+/**
+ * Converte texto digitado pelo usuário em centavos inteiros.
+ * Ex: "50,00" → 5000. Aceita vírgula ou ponto como separador decimal
+ * (input type="number" já rejeita vírgula no Chrome, mas alguns
+ * teclados Android a entregam).
+ *
+ * Entrada inválida, vazia ou negativa → 0. Nunca lança: a trava do
+ * submit é responsabilidade da tela, não desta função.
+ *
+ * IMPORTANTE: é a fronteira de entrada do dinheiro. Depois daqui o
+ * valor é sempre inteiro em centavos — nunca o número fracionado.
+ */
+export function reaisParaCentavos(texto: string): number {
+  const normalizado = texto.replace(",", ".").trim();
+  if (normalizado === "") return 0;
+  const reais = Number(normalizado);
+  if (Number.isNaN(reais) || reais < 0) return 0;
+  return Math.round(reais * 100);
 }
